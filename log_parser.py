@@ -38,7 +38,7 @@ def create_sql_line_by_line(logfile):
             ip_address = re.findall(re_ip_pattern, line)
             access_date_time = re.findall(re_datetime_pattern, line)
 
-            print('insert into access_log values (`{ip}`, `{dt}`)'.format(ip=ip_address[0], dt=access_date_time[0]))
+            print("""insert into access_log values ('{ip}', '{dt}')""".format(ip=ip_address[0], dt=access_date_time[0]))
 
 
 def create_connection_db(dbname):
@@ -55,9 +55,24 @@ def show_total_records(conn):
     sql = 'select count(id) from access_log'
     cur = conn.cursor()
     cur.execute(sql)
-    rows = cur.fetchone()
+    row = cur.fetchone()
 
-    return str(rows[0])
+    return str(row[0])
+
+
+def insert_log_to_table(conn, logfile):
+    with open(logfile) as f:
+        lines = f.readlines()
+        for line in lines:
+            ip_address = re.findall(re_ip_pattern, line)
+            access_date_time = re.findall(re_datetime_pattern, line)
+
+            sql = """insert into access_log(ip_address, access_datetime) 
+                     values ('{ip}', '{dt}')""".format(ip=ip_address[0], dt=access_date_time[0])
+            cur = conn.cursor()
+            cur.execute(sql)
+
+    return None
 
 
 if __name__ == '__main__':
@@ -70,11 +85,12 @@ if __name__ == '__main__':
 
     # create connection
     dbname = '/Users/worajedt/PycharmProjects/pycharmskill/log.sqlite'
-    conn = create_connection_db(dbname)
-    with conn:
-        print('Current records BEFORE insert = ' + show_total_records(conn))
+    conn_log = create_connection_db(dbname)
+
+    with conn_log:
+        print('Current records BEFORE insert = ' + show_total_records(conn_log))
 
         # insert records
-        # insert_log_to_table(conn)
+        insert_log_to_table(conn_log, 'access.log')
 
-        print('Current records AFTER insert = ' + show_total_records(conn))
+        print('Current records AFTER insert = ' + show_total_records(conn_log))
