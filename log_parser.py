@@ -30,8 +30,21 @@ def read_datetime_line_by_line(logfile):
             print(access_date_time[0])
 
 
+def create_sql_line_by_line(logfile):
+    with open(logfile) as f:
+        lines = f.readlines()
+        for line in lines:
+            ip_address = re.findall(re_ip_pattern, line)
+            access_date_time = re.findall(re_datetime_pattern, line)
+
+            print('insert into access values (`{ip}`, `{dt}`)'.format(ip=ip_address[0], dt=access_date_time[0]))
+
+
 if __name__ == '__main__':
     # log_reader('access.log')
 
     # read and print line by line
-    read_datetime_line_by_line('access.log')
+    # read_datetime_line_by_line('access.log')
+
+    # convert log to sql insert
+    create_sql_line_by_line('access.log')
