@@ -1,13 +1,15 @@
 import re
 from collections import Counter
 
+re_ip_pattern = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
+re_datetime_pattern = r'\[\d{1,2}/.{3}/\d{4}:\d{2}:\d{2}:\d{2}\s\+\d{4}\]'
+
 
 def log_reader(logfile):
     """
     อ่านไฟล์จากชื่อที่ส่งมา แล้ว print เนื้อหาออกไป
     :param logfile: file path + file name
     """
-    re_ip_pattern = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
 
     with open(logfile) as f:
         log = f.read()
@@ -20,5 +22,16 @@ def log_reader(logfile):
         # print(log)
 
 
+def read_datetime_line_by_line(logfile):
+    with open(logfile) as f:
+        lines = f.readlines()
+        for line in lines:
+            access_date_time = re.findall(re_datetime_pattern, line)
+            print(access_date_time[0])
+
+
 if __name__ == '__main__':
-    log_reader('access.log')
+    # log_reader('access.log')
+
+    # read and print line by line
+    read_datetime_line_by_line('access.log')
